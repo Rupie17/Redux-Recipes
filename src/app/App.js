@@ -1,47 +1,51 @@
-import React from 'react';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loadRecipes } from "./features/allRecipes/allRecipesSlice";
+import AllRecipes from "./features/allRecipes/AllRecipes";
+import FavoriteRecipes from "./features/favoriteRecipes/FavoriteRecipes";
+import Search from "./features/search/Search";
 
-import { AllRecipes } from '../features/allRecipes/AllRecipes.js';
-import { SearchTerm } from '../features/searchTerm/SearchTerm.js';
-import { FavoriteRecipes } from '../features/favoriteRecipes/FavoriteRecipes.js';
+function App() {
+  const dispatch = useDispatch();
+  const { hasError } = useSelector((state) => state.allRecipes);
 
-export function App(props) {
-  const {state, dispatch} = props;
+  useEffect(() => {
+    dispatch(loadRecipes());
+  }, [dispatch]);
 
-  const visibleAllRecipes = getFilteredRecipes(state.allRecipes, state.searchTerm);
-  const visibleFavoriteRecipes = getFilteredRecipes(state.favoriteRecipes, state.searchTerm);
+  const onTryAgainHandler = () => {
+    dispatch(loadRecipes());
+  };
 
-/* The slice data passed to <FavoriteRecipes /> will need to be filtered first based on the value 
-of state.searchTerm. The filtered version of state.favoriteRecipes has been created and stored in 
-the variable visibleFavoriteRecipes. */
   return (
-    <main>
-      <section>
-        <SearchTerm
-          searchTerm={state.searchTerm}
-          dispatch={dispatch}
-        />
-      </section>
-      <section>
-        <h2>Favorite Recipes</h2>
-        <FavoriteRecipes
-          favoriteRecipes={visibleFavoriteRecipes}
-          dispatch={dispatch}
-        />
-      </section>
-      <hr />
-      <section>
-        <h2>All Recipes</h2>
-        <AllRecipes
-          allRecipes={visibleAllRecipes} 
-          dispatch={dispatch}
-        />
-      </section>
-    </main>
-  )
+    <div id="app">
+      <header>
+        <Search />
+      </header>
+      <main id="recipes-wrapper">
+        {hasError ? (
+          <div id="error-wrapper">
+            <h1>
+              Oh no! There was a mess in the kitchen and we couldn't get the
+              recipes.
+            </h1>
+            <button onClick={onTryAgainHandler}>Try again</button>
+          </div>
+        ) : (
+          <>
+            <section id="favorite-recipes" className="recipes-section">
+              <h2 className="header">Favorites</h2>
+              <FavoriteRecipes />
+            </section>
+            <section className="recipes-section">
+              <h2 className="header">Recipes</h2>
+              <AllRecipes />
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+  );
 }
 
-/* Utility Helpers */
-
-function getFilteredRecipes(recipes, searchTerm) {
-  return recipes.filter(recipe => recipe.name.toLowerCase().includes(searchTerm.toLowerCase()));
-}
+export default App;

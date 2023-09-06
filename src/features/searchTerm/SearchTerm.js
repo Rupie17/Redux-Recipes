@@ -1,19 +1,23 @@
-import React from 'react';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearSearchTerm,
+  selectSearchTerm,
+  setSearchTerm,
+} from "./searchTermSlice";
+
 const searchIconUrl = 'https://static-assets.codecademy.com/Courses/Learn-Redux/Recipes-App/icons/search.svg'
 const clearIconUrl = 'https://static-assets.codecademy.com/Courses/Learn-Redux/Recipes-App/icons/clear.svg'
 
-import { setSearchTerm, clearSearchTerm } from './searchTermSlice.js';
+const Search = () => {
+  const dispatch = useDispatch();
+  const searchTerm = useSelector(selectSearchTerm);
 
-export const SearchTerm = (props) => {
-  
-  const { searchTerm, dispatch } = props;
-
-  const onSearchTermChangeHandler = (e) => {
-    const userInput = e.target.value;
-    dispatch(setSearchTerm(userInput));
+  const onSearchChangeHandler = (e) => {
+    dispatch(setSearchTerm(e.target.value));
   };
-  
-  const onClearSearchTermHandler = () => {
+
+  const onSearchTermClearHandler = () => {
     dispatch(clearSearchTerm());
   };
 
@@ -24,12 +28,12 @@ export const SearchTerm = (props) => {
         id="search"
         type="text"
         value={searchTerm}
-        onChange={onSearchTermChangeHandler}
+        onChange={onSearchChangeHandler}
         placeholder="Search recipes"
       />
       {searchTerm.length > 0 && (
         <button
-          onClick={onClearSearchTermHandler}
+          onClick={onSearchTermClearHandler}
           type="button"
           id="search-clear-button"
         >
@@ -39,3 +43,5 @@ export const SearchTerm = (props) => {
     </div>
   );
 };
+
+export default Search;

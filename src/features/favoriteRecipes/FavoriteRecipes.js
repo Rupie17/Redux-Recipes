@@ -1,48 +1,42 @@
-import React from 'react';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import FavoriteButton from "../../components/FavoriteButton";
 import Recipe from "../../components/Recipe";
+import {
+  selectFilteredFavoriteRecipes,
+  removeFavoriteRecipe,
+} from "./favoriteRecipesSlice";
+import Spinner from "../../components/Spinner";
+
 const unfavoriteIconUrl = 'https://static-assets.codecademy.com/Courses/Learn-Redux/Recipes-App/icons/unfavorite.svg'
 
-// Import removeRecipe from favoriteRecipesSlice.js
-import { removeRecipe } from './favoriteRecipesSlice.js';
+const FavoriteRecipes = () => {
+  const dispatch = useDispatch();
+  const favoriteRecipes = useSelector(selectFilteredFavoriteRecipes);
+  const { isLoading } = useSelector((state) => state.allRecipes);
 
-export const FavoriteRecipes = (props) =>{
-  
-  // Extract favoriteRecipe and dispatch from props.
-  const { favoriteRecipes, dispatch } = props;
-
-  const onRemoveRecipeHandler = (recipe) => {
-    // Dispatch a removeRecipe() action.
-    dispatch(removeRecipe(recipe));
+  const onRemoveFavoriteRecipeHandler = (recipe) => {
+    dispatch(removeFavoriteRecipe(recipe));
   };
-  
-  // Check to see if favoriteRecipes is empty.
-  const isEmpty = 'replace_me'
-  if (isEmpty) {
-    return (
-      <div className = "recipes-container">
-        <p> Choose Your Favorites Recipes! </p>
-      </div>
-    )
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
-  // Map the recipe objects in favoriteRecipes to render <Recipe /> components.
   return (
     <div className="recipes-container">
-      {favoriteRecipes.map(makeFavoriteRecipeComponent)}
+      {favoriteRecipes.map((recipe) => (
+        <Recipe recipe={recipe} key={recipe.id}>
+          <FavoriteButton
+            onClickHandler={() => onRemoveFavoriteRecipeHandler(recipe)}
+            icon={unfavoriteIconUrl}
+          >
+            Remove Favorite
+          </FavoriteButton>
+        </Recipe>
+      ))}
     </div>
   );
 };
 
-function makeFavoriteRecipeComponent(recipe) {
-  return (
-    <Recipe recipe={recipe} key={recipe.id}>
-      <FavoriteButton
-        onClickHandler={() => onRemoveRecipeHandler(recipe)}
-        icon={unfavoriteIconUrl}
-      >
-        Remove Favorite
-      </FavoriteButton>
-    </Recipe>
-  )
-}
+export default FavoriteRecipes;

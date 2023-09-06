@@ -1,20 +1,17 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./app/App";
+import store from "./app/store";
+import { Provider } from "react-redux";
+import { worker } from "./mocks/browser";
 
-import { App } from './app/App.js';
-// Import 'store' here.
-import { store } from './app/store.js';
+const root = createRoot(document.getElementById("root"));
+worker.start();
 
-const root = createRoot(document.getElementById('root'));
-const render = () => {
-  // Pass `state` and `dispatch` props to <App />
-  root.render(
-    <App 
-      state={store.getState()}
-      dispatch={store.dispatch}
-    />,
-  )
-}
-render();
-// Subscribe render to changes to the `store`
-store.subscribe(render);
+root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </React.StrictMode>
+);
